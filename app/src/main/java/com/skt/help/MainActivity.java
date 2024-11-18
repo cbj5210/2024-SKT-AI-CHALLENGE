@@ -11,7 +11,10 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.skt.help.gpt.service.GptService;
+
 public class MainActivity extends AppCompatActivity {
+    private GptService gptService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,11 +38,20 @@ public class MainActivity extends AppCompatActivity {
 
         // 하혁님 버튼
         Button btn_gpt = findViewById(R.id.button6);
-        btn_gpt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(MainActivity.this, "Gpt 응답 결과 : 112 신고 요망", Toast.LENGTH_SHORT).show();
-            }
+        gptService = new GptService(this);
+        btn_gpt.setOnClickListener(view -> {
+            // GPT API 호출 및 응답 처리
+            new Thread(() -> {
+                try {
+                    String speech = "왜 이러세요 살려주세요. 누가좀 도와주세요";
+                    String response = gptService.process(speech);
+
+                    runOnUiThread(() -> Toast.makeText(MainActivity.this, response, Toast.LENGTH_SHORT).show());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                }
+            }).start();
         });
     }
 }

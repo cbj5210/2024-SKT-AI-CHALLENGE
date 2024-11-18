@@ -1,6 +1,9 @@
 package com.skt.help;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +22,24 @@ public class MainActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+
+        // 주상님 버튼
+        Button btn_location = findViewById(R.id.button5);
+        btn_location.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this, "현재 주소는 : 을지로 2가", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // 하혁님 버튼
+        Button btn_gpt = findViewById(R.id.button6);
+        btn_gpt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this, "Gpt 응답 결과 : 112 신고 요망", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 }

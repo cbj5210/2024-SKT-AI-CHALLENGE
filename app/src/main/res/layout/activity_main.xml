@@ -141,9 +141,9 @@
                 android:layout_width="0px"
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
-                android:background="@drawable/rounded_green_button"
-                android:textColor="@color/white"
-                android:text="테스트 시작" />
+                android:background="@drawable/rounded_real_green_button"
+                android:text="테스트 시작"
+                android:textColor="@color/white" />
 
             <LinearLayout
                 android:layout_width="0px"
@@ -159,8 +159,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
                 android:background="@drawable/rounded_green_button"
-                android:textColor="@color/white"
-                android:text="테스트 종료" />
+                android:text="테스트 종료"
+                android:textColor="@color/white" />
 
             <LinearLayout
                 android:layout_width="0px"
@@ -192,9 +192,9 @@
                 android:layout_width="0px"
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
-                android:background="@drawable/rounded_red_button"
-                android:textColor="@color/white"
+                android:background="@drawable/rounded_real_red_button"
                 android:text="위험 감지 시작"
+                android:textColor="@color/white"
                 android:textColorLink="#000000" />
 
             <LinearLayout
@@ -211,8 +211,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
                 android:background="@drawable/rounded_red_button"
-                android:textColor="@color/white"
                 android:text="위험감지 종료"
+                android:textColor="@color/white"
                 android:textColorLink="#000000" />
 
             <LinearLayout

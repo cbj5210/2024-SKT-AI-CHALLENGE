@@ -23,15 +23,27 @@ import java.util.ArrayList;
 public class Foreground extends Service {
     private static final int NOTIFICATION_ID = 1;
 
+    // isTest? or isReal?
+    private boolean isReal;
+
     // Speech To Text
     private SpeechRecognizer speechRecognizer;
     private Intent intent;
+    private StringBuilder recordMessageBuilder;
 
     public Foreground() {}
 
     @Override
     public IBinder onBind(Intent intent) {
         throw new UnsupportedOperationException("Foreground onBind() exception");
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent != null) {
+            isReal = intent.getBooleanExtra("isReal", false);
+        }
+        return START_STICKY;
     }
 
     // ForeGround 액티비티 시작
@@ -149,7 +161,14 @@ public class Foreground extends Service {
         public void onResults(Bundle bundle) {
             // 음성 인식 성공
             ArrayList<String> matches = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-            Toast.makeText(Foreground.this, matches.get(0), Toast.LENGTH_SHORT).show();
+            String message = matches.get(0);
+
+            // 테스트가 아닌 경우
+            if (isReal) {
+
+            }
+
+            Toast.makeText(Foreground.this, message, Toast.LENGTH_SHORT).show();
 
             startSpeechRecognizer();
         }

@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.textfield.TextInputEditText;
 import com.skt.help.service.gpt.GptService;
 import com.skt.help.service.sns.SnsService;
 
@@ -28,6 +29,10 @@ public class MainActivity extends AppCompatActivity {
         // 필요한 권한 요청
         requestPermission();
 
+        // 텍스트 입력창 정의
+        TextInputEditText messageInput = findViewById(R.id.custom_message_text);
+        TextInputEditText numberInput = findViewById(R.id.custom_number_text);
+
         // 버튼 정의
         Button testStartButton = findViewById(R.id.testStartButton);
         Button testStopButton = findViewById(R.id.testStopButton);
@@ -39,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //버튼 비활성화 및 색상 변경
+                messageInput.setEnabled(false);
+                numberInput.setEnabled(false);
                 testStartButton.setEnabled(false);
                 testStartButton.setBackgroundResource(R.drawable.rounded_grey_button);
                 serviceStartButton.setEnabled(false);
@@ -46,8 +53,10 @@ public class MainActivity extends AppCompatActivity {
                 serviceStopButton.setEnabled(false);
                 serviceStopButton.setBackgroundResource(R.drawable.rounded_grey_button);
 
+                // Foreground Service 실행
                 Toast.makeText(MainActivity.this, "테스트 시작", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(MainActivity.this, Foreground.class);
+                intent.putExtra("isReal", false);
                 startService(intent);
             }
         });
@@ -56,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
         testStopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                messageInput.setEnabled(true);
+                numberInput.setEnabled(true);
                 testStartButton.setEnabled(true);
                 testStartButton.setBackgroundResource(R.drawable.rounded_real_green_button);
                 serviceStartButton.setEnabled(true);
@@ -73,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
         serviceStartButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                messageInput.setEnabled(false);
+                numberInput.setEnabled(false);
                 testStartButton.setEnabled(false);
                 testStartButton.setBackgroundResource(R.drawable.rounded_grey_button);
                 testStopButton.setEnabled(false);
@@ -82,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
 
                 Toast.makeText(MainActivity.this, "위험 감지 시작", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(MainActivity.this, Foreground.class);
+                intent.putExtra("isReal", true);
                 startService(intent);
             }
         });
@@ -90,6 +104,8 @@ public class MainActivity extends AppCompatActivity {
         serviceStopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                messageInput.setEnabled(true);
+                numberInput.setEnabled(true);
                 testStartButton.setEnabled(true);
                 testStartButton.setBackgroundResource(R.drawable.rounded_real_green_button);
                 testStopButton.setEnabled(true);

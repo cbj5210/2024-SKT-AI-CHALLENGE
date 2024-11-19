@@ -13,12 +13,24 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.material.textfield.TextInputEditText;
+
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+import android.Manifest;
+
 import com.skt.help.service.gpt.GptService;
+import com.skt.help.service.location.AddressService;
+import com.skt.help.service.location.LocationService;
 import com.skt.help.service.sns.SnsService;
 
 public class MainActivity extends AppCompatActivity {
     private GptService gptService;
     private SnsService service;
+
+    private LocationService locationService;
+    private AddressService addressService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,11 +134,24 @@ public class MainActivity extends AppCompatActivity {
 
         // 주상님 버튼
         Button btn_location = findViewById(R.id.button5);
-        btn_location.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(MainActivity.this, "현재 주소는 : 을지로 2가", Toast.LENGTH_SHORT).show();
-            }
+        locationService = new LocationService(this);
+        addressService = new AddressService();
+        btn_location.setOnClickListener(view -> {
+            locationService.getLastKnownLocation(new LocationService.LocationCallbackListener() {
+                @Override
+                public void onLocationReceived(double latitude, double longitude) {
+                    double myLatitude = 37.339578;
+                    double myLongitude = 127.092850;
+                    String locationText = "위도: " + latitude + "\n경도: " + longitude;
+                    Toast.makeText(MainActivity.this, locationText, Toast.LENGTH_SHORT).show();
+                    addressService.convert(myLatitude, myLongitude);
+                }
+
+                @Override
+                public void onLocationError(String errorMsg) {
+                    Toast.makeText(MainActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
         // 하혁님 버튼
@@ -148,6 +173,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             }).start();
         });
+
+        // 권한 확인 및 요청 코드 추가 (MainActivity의 onCreate()에서)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    100);  // REQUEST_CODE는 원하는 값으로 설정 가능
+        }
+
     }
 
     private void requestPermission(){

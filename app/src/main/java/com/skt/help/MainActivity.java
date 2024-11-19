@@ -1,5 +1,7 @@
 package com.skt.help;
 
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -7,6 +9,8 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -23,11 +27,58 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+
+        // 필요한 권한 요청
+        requestPermission();
+
+        // 버튼 정의
+        Button testStartButton = findViewById(R.id.testStartButton);
+        Button testStopButton = findViewById(R.id.testStopButton);
+        Button serviceStartButton = findViewById(R.id.serviceStartButton);
+        Button serviceStopButton = findViewById(R.id.serviceStopButton);
+
+        // 테스트 시작 버튼 클릭
+        testStartButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //todo : 나머지 버튼 비활성화 및 색상 변경
+
+                Toast.makeText(MainActivity.this, "테스트 시작", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, Foreground.class);
+                startService(intent);
+            }
         });
+
+        // 테스트 종료 버튼 클릭
+        testStopButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this, "테스트 종료", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, Foreground.class);
+                stopService(intent);
+            }
+        });
+
+        // 서비스 시작 버튼 클릭
+        serviceStartButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this, "위험 감지 시작", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, Foreground.class);
+                startService(intent);
+            }
+        });
+
+        // 서비스 종료 버튼 클릭
+        serviceStopButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this, "위험 감지 종료", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, Foreground.class);
+                stopService(intent);
+            }
+        });
+
 
         // 주상님 버튼
         Button btn_location = findViewById(R.id.button5);
@@ -57,5 +108,19 @@ public class MainActivity extends AppCompatActivity {
                 }
             }).start();
         });
+    }
+
+    private void requestPermission(){
+        if (ContextCompat.checkSelfPermission(this,
+                android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED){
+
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[] {android.Manifest.permission.RECORD_AUDIO}, 0
+            );
+        }
+
+        // todo
+        // gps, sms
     }
 }

@@ -38,7 +38,13 @@ public class MainActivity extends AppCompatActivity {
         testStartButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //todo : 나머지 버튼 비활성화 및 색상 변경
+                //버튼 비활성화 및 색상 변경
+                testStartButton.setEnabled(false);
+                testStartButton.setBackgroundResource(R.drawable.rounded_grey_button);
+                serviceStartButton.setEnabled(false);
+                serviceStartButton.setBackgroundResource(R.drawable.rounded_grey_button);
+                serviceStopButton.setEnabled(false);
+                serviceStopButton.setBackgroundResource(R.drawable.rounded_grey_button);
 
                 Toast.makeText(MainActivity.this, "테스트 시작", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(MainActivity.this, Foreground.class);
@@ -50,6 +56,13 @@ public class MainActivity extends AppCompatActivity {
         testStopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                testStartButton.setEnabled(true);
+                testStartButton.setBackgroundResource(R.drawable.rounded_real_green_button);
+                serviceStartButton.setEnabled(true);
+                serviceStartButton.setBackgroundResource(R.drawable.rounded_real_red_button);
+                serviceStopButton.setEnabled(true);
+                serviceStopButton.setBackgroundResource(R.drawable.rounded_red_button);
+
                 Toast.makeText(MainActivity.this, "테스트 종료", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(MainActivity.this, Foreground.class);
                 stopService(intent);
@@ -60,6 +73,13 @@ public class MainActivity extends AppCompatActivity {
         serviceStartButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                testStartButton.setEnabled(false);
+                testStartButton.setBackgroundResource(R.drawable.rounded_grey_button);
+                testStopButton.setEnabled(false);
+                testStopButton.setBackgroundResource(R.drawable.rounded_grey_button);
+                serviceStartButton.setEnabled(false);
+                serviceStartButton.setBackgroundResource(R.drawable.rounded_grey_button);
+
                 Toast.makeText(MainActivity.this, "위험 감지 시작", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(MainActivity.this, Foreground.class);
                 startService(intent);
@@ -70,6 +90,13 @@ public class MainActivity extends AppCompatActivity {
         serviceStopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                testStartButton.setEnabled(true);
+                testStartButton.setBackgroundResource(R.drawable.rounded_real_green_button);
+                testStopButton.setEnabled(true);
+                testStopButton.setBackgroundResource(R.drawable.rounded_green_button);
+                serviceStartButton.setEnabled(true);
+                serviceStartButton.setBackgroundResource(R.drawable.rounded_real_red_button);
+
                 Toast.makeText(MainActivity.this, "위험 감지 종료", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(MainActivity.this, Foreground.class);
                 stopService(intent);

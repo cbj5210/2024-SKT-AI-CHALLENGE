@@ -11,9 +11,6 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.skt.help.service.gpt.GptService;
 import com.skt.help.service.sns.SnsService;
@@ -121,6 +118,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // todo
-        // gps, sms
+        // gps, sms, notification
     }
 }

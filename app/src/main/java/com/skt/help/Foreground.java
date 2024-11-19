@@ -55,7 +55,12 @@ public class Foreground extends Service {
     public void onDestroy() {
         super.onDestroy();
 
-        stopSpeechRecognizer();
+        // 리스너 미종료 및 Memory Leak 방지
+        if (speechRecognizer != null) {
+            speechRecognizer.stopListening();
+            speechRecognizer.destroy();
+            speechRecognizer = null;
+        }
     }
 
     private void makeNotification() {
@@ -64,8 +69,8 @@ public class Foreground extends Service {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("STT 변환")
-                .setContentText("음성인식 중..")
+                .setContentTitle("긴급상황 도와줘")
+                .setContentText("긴급상황 탐지 중..")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setColor(Color.RED);
 
@@ -103,7 +108,6 @@ public class Foreground extends Service {
     private void stopSpeechRecognizer(){
         // 리스너 미종료 및 Memory Leak 방지
         if (speechRecognizer != null) {
-            speechRecognizer.stopListening();
             speechRecognizer.destroy();
             speechRecognizer = null;
         }
@@ -138,6 +142,7 @@ public class Foreground extends Service {
         @Override
         public void onError(int i) {
             // todo error message
+            startSpeechRecognizer();
         }
 
         @Override

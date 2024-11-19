@@ -1,8 +1,8 @@
-package com.skt.help.gpt.service;
+package com.skt.help.service.gpt;
 
 import android.content.Context;
 
-import com.skt.help.gpt.repository.OpenAIRepository;
+import com.skt.help.repository.OpenAIRepository;
 
 import java.util.HashMap;
 import java.util.Map;

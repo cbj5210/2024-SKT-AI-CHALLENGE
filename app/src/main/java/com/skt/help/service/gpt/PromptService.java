@@ -1,4 +1,4 @@
-package com.skt.help.gpt.service;
+package com.skt.help.service.gpt;
 
 import android.content.Context;
 

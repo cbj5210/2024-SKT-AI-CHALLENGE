@@ -1,8 +1,8 @@
-package com.skt.help.gpt.repository;
+package com.skt.help.repository;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.skt.help.gpt.api.OpenAIApi;
+import com.skt.help.api.OpenAIApi;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -15,6 +15,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class OpenAIRepository {
+    private String API_KEY = "Bearer ";
+    private String key;
     private final OpenAIApi openAIApi;
     private final ObjectMapper objectMapper;
 
@@ -38,13 +40,13 @@ public class OpenAIRepository {
 
     public String chat(String prompt) {
         try {
-            Call<ResponseBody> call = openAIApi.sendMessageRaw(makeBody(prompt));
+            Call<ResponseBody> call = openAIApi.sendMessageRaw(API_KEY, makeBody(prompt));
             Response<ResponseBody> response = call.execute();
 
             if (response.isSuccessful() && response.body() != null) {
                 JsonNode responseJson = objectMapper.readTree(response.body().string());
                 JsonNode messageNode = responseJson.path("choices").get(0).path("message").path("content");
-                return messageNode.asText(); // content 반환
+                return messageNode.asText();
             } else {
                 throw new RuntimeException("API Error: " + response.code());
             }

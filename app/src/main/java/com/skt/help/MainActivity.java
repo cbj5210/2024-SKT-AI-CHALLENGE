@@ -2,6 +2,7 @@ package com.skt.help;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -186,6 +187,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void requestPermission(){
+        // RECORD_AUDIO 권한 요청
         if (ContextCompat.checkSelfPermission(this,
                 android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED){
 
@@ -195,7 +197,38 @@ public class MainActivity extends AppCompatActivity {
             );
         }
 
-        // todo
-        // gps, sms, notification
+        // GPS 권한 요청
+        if (ContextCompat.checkSelfPermission(this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this,
+                        android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{
+                            android.Manifest.permission.ACCESS_FINE_LOCATION,
+                            android.Manifest.permission.ACCESS_COARSE_LOCATION
+                    }, 1
+            );
+        }
+
+        // SMS 권한 요청
+        if (ContextCompat.checkSelfPermission(this,
+                android.Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{android.Manifest.permission.SEND_SMS}, 2
+            );
+        }
+
+        // Notification 권한 요청 (안드로이드 13 이상)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this,
+                    android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                        this,
+                        new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 3
+                );
+            }
+        }
     }
 }

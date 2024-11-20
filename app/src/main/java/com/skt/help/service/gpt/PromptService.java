@@ -31,7 +31,7 @@ public class PromptService {
     public String generatePrompt(Map<String, String> data) {
         try (StringWriter writer = new StringWriter()) {
             mustache.execute(writer, data).flush();
-            return writer.toString().replace("\n", "");
+            return writer.toString().replace("\n", "\\\\n");
         } catch (Exception e) {
             e.printStackTrace();
             return null;

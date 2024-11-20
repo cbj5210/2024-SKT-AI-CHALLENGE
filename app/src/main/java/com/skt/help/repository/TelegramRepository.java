@@ -39,7 +39,6 @@ public class TelegramRepository {
     public void sendMessage(String message) {
         try {
             Call<TelegramResponse> call = telegramApi.sendMessage(new TelegramMessage(CHAT_ID, message));
-            System.out.println("log:: " + call.request().url().toString());
 
             Response<TelegramResponse> response = call.execute();
 

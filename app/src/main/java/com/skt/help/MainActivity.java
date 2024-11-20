@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,6 +27,7 @@ import com.skt.help.repository.NaverRepository.ReverseGeocodeCallback;
 import com.skt.help.service.gpt.GptService;
 import com.skt.help.service.location.AddressService;
 import com.skt.help.service.location.LocationService;
+import com.skt.help.service.mlmodel.EmbeddedModelService;
 import com.skt.help.service.sns.SmsService;
 import com.skt.help.service.sns.SnsService;
 
@@ -38,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
     private LocationService locationService;
     private AddressService addressService;
+    private EmbeddedModelService embeddedModelService;
 
     private DatabaseRepository databaseRepository;
     private final long id = 1;
@@ -271,13 +274,16 @@ public class MainActivity extends AppCompatActivity {
         // 하혁님 버튼
         Button btn_gpt = findViewById(R.id.button6);
         gptService = new GptService(this);
+        embeddedModelService = new EmbeddedModelService(this);
         service = new SnsService();
         btn_gpt.setOnClickListener(view -> {
             new Thread(() -> {
                 try {
-                    String speech = "왜 이러세요 살려주세요. 누가좀 도와주세요";
+                    String speech = "지하철 사고가 났어요. 구조해주세요";
+                    boolean isEmergency = embeddedModelService.isEmergency(speech);
+                    Log.d("== isEmergency == ", Boolean.toString(isEmergency));
                     String gptResponse = gptService.process(speech);
-                    service.sendTelegramMessage("위험 수치 : " + gptResponse);
+                    service.sendTelegramMessage(gptResponse);
                     runOnUiThread(() -> {
                         Toast.makeText(MainActivity.this, gptResponse, Toast.LENGTH_SHORT).show();
                     });

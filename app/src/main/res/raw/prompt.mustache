@@ -1,4 +1,17 @@
-You are a korean voice analysis expert.
-Based on the following voice content of a user using the emergency alert application, determine whether it is an emergency situation.
-Your response should be only an integer between 0 and 100, where a higher number indicates a greater level of danger, with 100 being the most critical.
-Speech : {{speech}}
+Create a message requesting help in an emergency situation using the format below. Remove any additional text or guidance other than the specified format.
+** 데이터 **
+위급상황 타입 : {{emergencyType}}
+시간 : {{dateTime}}
+마지막 위치: {{latestPosition}}
+이동경로 : {{route}}
+보호자 연락처 : {{parentPhoneNumber}}
+** 포맷 **
+[긴급 상황 발생]
+
+위급상황 타입 :
+시간:
+마지막 위치:
+이동 경로:
+
+사용자가 위급한 상황에 처해 있습니다. 빠른 구조 및 지원이 필요합니다.
+(보호자 연락처 : )

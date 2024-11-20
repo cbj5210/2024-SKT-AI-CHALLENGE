@@ -30,6 +30,9 @@ public class Foreground extends Service {
     // isTest? or isReal?
     private boolean isReal;
 
+    // isEmergency?
+    private boolean isEmergency = false;
+
     // inputText & numberText
     private String inputText;
     private String numberText;
@@ -37,7 +40,7 @@ public class Foreground extends Service {
     // Speech To Text
     private SpeechRecognizer speechRecognizer;
     private Intent intent;
-    private List<String> recordMessageList;
+    private List<String> recordMessageList = new ArrayList<>();
 
     public Foreground() {}
 
@@ -179,12 +182,13 @@ public class Foreground extends Service {
             if (isReal) { // 테스트가 아닌 경우
                 if (trimMessage.contains(inputText)) { //  위험 감지 메세지가 포함된 경우 새로운 위험이 발생했다고 판단하고
                     recordMessageList = new ArrayList<>(); // list 초기화
+                    isEmergency = true;
                 }
 
                 recordMessageList.add(message); // list에 음성 텍스트 추가
 
                 // 위험 감지 이후 3번 음성을 인식 하였으면
-                if (!CollectionUtils.isEmpty(recordMessageList) && recordMessageList.size() == 3) {
+                if (isEmergency && !CollectionUtils.isEmpty(recordMessageList) && recordMessageList.size() == 3) {
                     String gptRequestMessage = String.join(" ", recordMessageList);
 
                     // todo : remove for test
@@ -195,8 +199,10 @@ public class Foreground extends Service {
                     // todo : Call GPT
 
                     // todo : 단발성 발송일지, 추적 관찰이 필요할지 서비스 분기
-                }
 
+                    // todo : 긴급 상황 전파 완료
+                    isEmergency = false;
+                }
             } else { // 테스트인 경우
                 Toast.makeText(Foreground.this, message, Toast.LENGTH_SHORT).show();
             }

@@ -177,7 +177,7 @@ public class Foreground extends Service {
             String trimMessage = message.replaceAll(" ", "");
 
             if (isReal) { // 테스트가 아닌 경우
-                if (trimMessage.contains(inputText)) { //  위험 감지 메세지가 포함된 경우
+                if (trimMessage.contains(inputText)) { //  위험 감지 메세지가 포함된 경우 새로운 위험이 발생했다고 판단하고
                     recordMessageList = new ArrayList<>(); // list 초기화
                 }
 
@@ -190,7 +190,11 @@ public class Foreground extends Service {
                     // todo : remove for test
                     Toast.makeText(Foreground.this, gptRequestMessage, Toast.LENGTH_SHORT).show();
 
+                    // todo : 현위치 파악
+
                     // todo : Call GPT
+
+                    // todo : 단발성 발송일지, 추적 관찰이 필요할지 서비스 분기
                 }
 
             } else { // 테스트인 경우

@@ -21,6 +21,8 @@ import androidx.core.view.WindowInsetsCompat;
 
 import android.Manifest;
 
+import com.skt.help.repository.NaverRepository;
+import com.skt.help.repository.NaverRepository.ReverseGeocodeCallback;
 import com.skt.help.service.gpt.GptService;
 import com.skt.help.service.location.AddressService;
 import com.skt.help.service.location.LocationService;
@@ -146,11 +148,21 @@ public class MainActivity extends AppCompatActivity {
             locationService.getLastKnownLocation(new LocationService.LocationCallbackListener() {
                 @Override
                 public void onLocationReceived(double latitude, double longitude) {
-                    double myLatitude = 37.339578;
-                    double myLongitude = 127.092850;
-                    String locationText = "위도: " + latitude + "\n경도: " + longitude;
-                    Toast.makeText(MainActivity.this, locationText, Toast.LENGTH_SHORT).show();
-                    addressService.convert(myLatitude, myLongitude);
+                    double myLatitude = 37.267326;
+                    double myLongitude = 127.399044;
+                    String coordinate = myLongitude + "," + myLatitude;
+                    String coordinateText = "위도: " + latitude + ", 경도: " + longitude;
+                    addressService.convert(coordinate, new ReverseGeocodeCallback() {
+                        @Override
+                        public void onSuccess(String address) {
+                            Toast.makeText(MainActivity.this, address.concat("\n").concat(coordinateText), Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onError(String errorMessage) {
+                            Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
 
                 @Override
@@ -159,6 +171,36 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         });
+
+        Button btn_location_repeat = findViewById(R.id.button7);
+        btn_location_repeat.setOnClickListener(view -> {
+            locationService.requestLocationUpdates(new LocationService.LocationCallbackListener() {
+                @Override
+                public void onLocationReceived(double latitude, double longitude) {
+                    double myLatitude = 37.339578;
+                    double myLongitude = 127.092850;
+                    String coordinate = myLongitude + "," + myLatitude;
+                    String coordinateText = "위도: " + latitude + ", 경도: " + longitude;
+                    addressService.convert(coordinate, new ReverseGeocodeCallback() {
+                        @Override
+                        public void onSuccess(String address) {
+                            Toast.makeText(MainActivity.this, address.concat("\n").concat(coordinateText), Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onError(String errorMessage) {
+                            Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+                @Override
+                public void onLocationError(String errorMsg) {
+                    Toast.makeText(MainActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
+
 
         // 하혁님 버튼
         Button btn_gpt = findViewById(R.id.button6);

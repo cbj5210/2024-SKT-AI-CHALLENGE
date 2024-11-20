@@ -17,7 +17,6 @@ public class NaverRepository {
 
     private final String clientId = "";
     private final String clientSecret = "";
-
     private static final String TAG = "MainActivity";
     private final NaverApi naverApi;
 
@@ -39,23 +38,41 @@ public class NaverRepository {
         naverApi = retrofit.create(NaverApi.class);
     }
 
-    public void convert2Address(double latitude, double longitude) {
+    public interface ReverseGeocodeCallback {
+        void onSuccess(String address);  // 성공 시 주소 반환
+        void onError(String errorMessage);  // 실패 시 에러 메시지 반환
+    }
+
+    public void convert2Address(String coodrnidate, ReverseGeocodeCallback callback) {
 
         Call<ReverseGeocodeResponse> call = naverApi.convert2Address(clientId, clientSecret,
-                    longitude + "," + latitude, "json", "legalcode,admcode,addr,roadaddr");
+                coodrnidate, "json", "roadaddr");
 
         call.enqueue(new Callback<ReverseGeocodeResponse>() {
             @Override
             public void onResponse(Call<ReverseGeocodeResponse> call, Response<ReverseGeocodeResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     ReverseGeocodeResponse result = response.body();
+                    StringBuilder addressBuilder = new StringBuilder();
                     for (ReverseGeocodeResponse.Result res : result.getResults()) {
-                        Log.d(TAG, "주소: " + res.getRegion().getArea1().getName() + ", "
-                                + res.getRegion().getArea2().getName() + ", "
-                                + res.getRegion().getArea3().getName());
+                        addressBuilder.append(res.getRegion().getArea1().getName()).append(" ")
+                                .append(res.getRegion().getArea2().getName()).append(" ")
+                                .append(res.getRegion().getArea3().getName()).append(" ")
+                                .append(res.getLand().getName()).append(" ")
+                                .append(res.getLand().getNumber1());
+                        if(res.getLand().getNumber2().isEmpty()) {
+                            addressBuilder.append("\n");
+                        } else {
+                            addressBuilder.append("-").append(res.getLand().getNumber2()).append("\n");
+                        }
                     }
+                    String address = addressBuilder.toString();
+                    Log.d(TAG, "주소: " + address);
+                    callback.onSuccess(address);
+
                 } else {
                     Log.e(TAG, "API 요청 실패: " + response.message());
+                    callback.onError("API 요청 실패: " + response.message());
                 }
             }
 

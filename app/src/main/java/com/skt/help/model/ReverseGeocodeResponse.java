@@ -16,10 +16,32 @@ public class ReverseGeocodeResponse {
         @SerializedName("region")
         private Region region;
 
+        @SerializedName("land")
+        private Land land;
+
         public Region getRegion() {
             return region;
         }
 
+        public Land getLand() { return land; }
+
+        public static class Land {
+            @SerializedName("name")
+            private String name;
+            @SerializedName("number1")
+            private String number1;
+
+            @SerializedName("number2")
+            private String number2;
+
+            public String getName() {return name;}
+
+            public String getNumber1() {return number1;}
+
+            public String getNumber2() {return number2;}
+
+
+        }
         public static class Region {
             @SerializedName("area1")
             private Area area1;

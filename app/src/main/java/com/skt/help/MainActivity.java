@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,6 +19,9 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 
+import com.skt.help.data.database.DatabaseHelper;
+import com.skt.help.repository.DatabaseRepository;
+import com.skt.help.model.UserCondition;
 import com.skt.help.repository.NaverRepository.ReverseGeocodeCallback;
 import com.skt.help.service.gpt.GptService;
 import com.skt.help.service.location.AddressService;
@@ -33,6 +39,11 @@ public class MainActivity extends AppCompatActivity {
     private LocationService locationService;
     private AddressService addressService;
 
+    private DatabaseRepository databaseRepository;
+    private final long id = 1;
+    private final Handler handler = new Handler();
+    private Runnable saveRunnable;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,9 +53,69 @@ public class MainActivity extends AppCompatActivity {
         // 필요한 권한 요청
         requestPermission();
 
+        databaseRepository = new DatabaseRepository(this);
+        databaseRepository.open();
+
+        UserCondition userCondition = null;
+        if(databaseRepository.isTableEmpty(DatabaseHelper.TABLE_NAME)) {
+            // empty 이기 때문에 기초값 insert 하고 객체 리턴
+            userCondition = databaseRepository.insertInitialUserCondition();
+
+        } else {
+            userCondition = databaseRepository.fetchUserCondition(id);
+        }
+
         // 텍스트 입력창 정의
         EditText messageInput = findViewById(R.id.custom_emergency_message_text);
         EditText customStatusInput = findViewById(R.id.custom_status_text);
+
+        if(!Objects.isNull(userCondition)) {
+            messageInput.setText(userCondition.keyword());
+            customStatusInput.setText(userCondition.conditions());
+        }
+
+        messageInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                if (saveRunnable != null) {
+                    handler.removeCallbacks(saveRunnable);
+                }
+                saveRunnable = () -> databaseRepository.updateUser(id, s.toString(), customStatusInput.getText().toString());  // 사용자 ID 1로 가정
+                handler.postDelayed(saveRunnable, 2000);  // 2초 후에 DB 업데이트 실행
+
+            }
+        });
+        customStatusInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (saveRunnable != null) {
+                    handler.removeCallbacks(saveRunnable);
+                }
+                saveRunnable = () -> databaseRepository.updateUser(id, messageInput.getText().toString(), s.toString());  // 사용자 ID 1로 가정
+                handler.postDelayed(saveRunnable, 2000);  // 2초 후에 DB 업데이트 실행
+            }
+        });
 
         // 버튼 정의
         Button testStartButton = findViewById(R.id.testStartButton);
@@ -278,5 +349,11 @@ public class MainActivity extends AppCompatActivity {
                 );
             }
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        databaseRepository.close();  // 액티비티 종료 시 DB 닫기
     }
 }

@@ -26,6 +26,9 @@ import com.skt.help.service.location.AddressService;
 import com.skt.help.service.location.LocationService;
 import com.skt.help.service.sns.SnsService;
 
+import java.util.Objects;
+import java.util.Optional;
+
 public class MainActivity extends AppCompatActivity {
     private GptService gptService;
     private SnsService service;
@@ -109,6 +112,8 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "위험 감지 시작", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(MainActivity.this, Foreground.class);
                 intent.putExtra("isReal", true);
+                intent.putExtra("messageInput", Objects.requireNonNull(messageInput.getText()).toString().replaceAll(" ", ""));
+                intent.putExtra("numberInput", Optional.ofNullable(numberInput.getText()).map(Object::toString).orElse(null));
                 startService(intent);
             }
         });

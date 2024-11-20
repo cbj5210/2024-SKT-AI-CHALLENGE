@@ -70,7 +70,7 @@
                 android:layout_width="0px"
                 android:layout_height="wrap_content"
                 android:layout_weight="10"
-                android:text="살려주세요 도와주세요" />
+                android:text="시작" />
 
             <LinearLayout
                 android:layout_width="0px"

@@ -18,7 +18,11 @@ import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 
+import com.google.android.gms.common.util.CollectionUtils;
+
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Foreground extends Service {
     private static final int NOTIFICATION_ID = 1;
@@ -26,10 +30,14 @@ public class Foreground extends Service {
     // isTest? or isReal?
     private boolean isReal;
 
+    // inputText & numberText
+    private String inputText;
+    private String numberText;
+
     // Speech To Text
     private SpeechRecognizer speechRecognizer;
     private Intent intent;
-    private StringBuilder recordMessageBuilder;
+    private List<String> recordMessageList;
 
     public Foreground() {}
 
@@ -42,6 +50,8 @@ public class Foreground extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
             isReal = intent.getBooleanExtra("isReal", false);
+            inputText = intent.getStringExtra("messageInput");
+            numberText = intent.getStringExtra("numberInput");
         }
         return START_STICKY;
     }
@@ -73,6 +83,8 @@ public class Foreground extends Service {
             speechRecognizer.destroy();
             speechRecognizer = null;
         }
+
+        recordMessageList = null;
     }
 
     private void makeNotification() {
@@ -162,13 +174,28 @@ public class Foreground extends Service {
             // 음성 인식 성공
             ArrayList<String> matches = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
             String message = matches.get(0);
+            String trimMessage = message.replaceAll(" ", "");
 
-            // 테스트가 아닌 경우
-            if (isReal) {
+            if (isReal) { // 테스트가 아닌 경우
+                if (trimMessage.contains(inputText)) { //  위험 감지 메세지가 포함된 경우
+                    recordMessageList = new ArrayList<>(); // list 초기화
+                }
 
+                recordMessageList.add(message); // list에 음성 텍스트 추가
+
+                // 위험 감지 이후 3번 음성을 인식 하였으면
+                if (!CollectionUtils.isEmpty(recordMessageList) && recordMessageList.size() == 3) {
+                    String gptRequestMessage = String.join(" ", recordMessageList);
+
+                    // todo : remove for test
+                    Toast.makeText(Foreground.this, gptRequestMessage, Toast.LENGTH_SHORT).show();
+
+                    // todo : Call GPT
+                }
+
+            } else { // 테스트인 경우
+                Toast.makeText(Foreground.this, message, Toast.LENGTH_SHORT).show();
             }
-
-            Toast.makeText(Foreground.this, message, Toast.LENGTH_SHORT).show();
 
             startSpeechRecognizer();
         }

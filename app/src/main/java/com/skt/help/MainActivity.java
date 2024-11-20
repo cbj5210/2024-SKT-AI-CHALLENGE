@@ -27,6 +27,7 @@ import com.skt.help.repository.NaverRepository.ReverseGeocodeCallback;
 import com.skt.help.service.gpt.GptService;
 import com.skt.help.service.location.AddressService;
 import com.skt.help.service.location.LocationService;
+import com.skt.help.service.sns.SmsService;
 import com.skt.help.service.sns.SnsService;
 
 import java.util.Objects;
@@ -232,6 +233,12 @@ public class MainActivity extends AppCompatActivity {
                     100);  // REQUEST_CODE는 원하는 값으로 설정 가능
         }
 
+        // sms 버튼
+        Button sms_button = findViewById(R.id.button8);
+        sms_button.setOnClickListener(view -> {
+            SmsService smsService = new SmsService();
+            smsService.sendSmsMessage("010-5353-5210", "문자 발송 테스트");
+        });
     }
 
     private void requestPermission(){

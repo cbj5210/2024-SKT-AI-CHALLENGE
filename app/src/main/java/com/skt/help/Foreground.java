@@ -18,13 +18,19 @@ import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.common.util.CollectionUtils;
+import com.skt.help.model.ChatGptResponse;
+import com.skt.help.service.gpt.GptService;
+import com.skt.help.service.sns.SmsService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Foreground extends Service {
     private static final int NOTIFICATION_ID = 1;
+    private static ObjectMapper objectMapper = new ObjectMapper();
 
     // isTest? or isReal?
     private boolean isReal;
@@ -188,6 +194,7 @@ public class Foreground extends Service {
 
                 // 위험 감지 이후 3번 음성을 인식 하였으면
                 if (isEmergency && !CollectionUtils.isEmpty(recordMessageList) && recordMessageList.size() == 3) {
+
                     String gptRequestMessage = String.join(" ", recordMessageList);
 
                     // todo : remove for test
@@ -196,10 +203,40 @@ public class Foreground extends Service {
                     // todo : 현위치 파악
 
                     // todo : Call GPT
+                    GptService gptService = new GptService(getApplicationContext());
+                    String gptTextResponse = gptService.process(gptRequestMessage);
 
-                    // todo : 단발성 발송일지, 추적 관찰이 필요할지 서비스 분기
+                    ChatGptResponse gptResponse;
+                    try {
+                        gptResponse = objectMapper.readValue(gptTextResponse, ChatGptResponse.class);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
 
-                    // todo : 긴급 상황 전파 완료
+                    // 긴급 상황이면
+                    if (gptResponse.isEmergency()) {
+                        String context = gptResponse.getContext();
+                        SmsService smsService = new SmsService();
+
+                        // 단발성 발송일지, 추적 관찰이 필요할지 서비스 분기
+                        if (gptResponse.isLocationTracking()) {
+                            // todo : 추적 관찰 필요
+                            // 위치 정보  새로 받아야함
+
+                        } else {
+                            // 단발성 메세지 전송
+                            String target = gptResponse.getTarget();
+                            if (target != null) {
+                                smsService.sendSmsMessage(target, context);
+                            }
+
+                            for (String number : gptResponse.getContextTo()) {
+                                smsService.sendSmsMessage(number, context);
+                            }
+                        }
+                    }
+
+                    // 긴급 상황 전파 완료
                     isEmergency = false;
                 }
             } else { // 테스트인 경우

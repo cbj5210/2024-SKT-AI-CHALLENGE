@@ -14,15 +14,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.google.android.material.textfield.TextInputEditText;
-
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
 import android.Manifest;
 
-import com.skt.help.repository.NaverRepository;
 import com.skt.help.repository.NaverRepository.ReverseGeocodeCallback;
 import com.skt.help.service.gpt.GptService;
 import com.skt.help.service.location.AddressService;

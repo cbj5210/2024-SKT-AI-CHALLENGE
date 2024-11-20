@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -48,8 +49,8 @@ public class MainActivity extends AppCompatActivity {
         requestPermission();
 
         // 텍스트 입력창 정의
-        TextInputEditText messageInput = findViewById(R.id.custom_message_text);
-        TextInputEditText numberInput = findViewById(R.id.custom_number_text);
+        EditText messageInput = findViewById(R.id.custom_emergency_message_text);
+        EditText customStatusInput = findViewById(R.id.custom_status_text);
 
         // 버튼 정의
         Button testStartButton = findViewById(R.id.testStartButton);
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 //버튼 비활성화 및 색상 변경
                 messageInput.setEnabled(false);
-                numberInput.setEnabled(false);
+                customStatusInput.setEnabled(false);
                 testStartButton.setEnabled(false);
                 testStartButton.setBackgroundResource(R.drawable.rounded_grey_button);
                 serviceStartButton.setEnabled(false);
@@ -84,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 messageInput.setEnabled(true);
-                numberInput.setEnabled(true);
+                customStatusInput.setEnabled(true);
                 testStartButton.setEnabled(true);
                 testStartButton.setBackgroundResource(R.drawable.rounded_real_green_button);
                 serviceStartButton.setEnabled(true);
@@ -103,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 messageInput.setEnabled(false);
-                numberInput.setEnabled(false);
+                customStatusInput.setEnabled(false);
                 testStartButton.setEnabled(false);
                 testStartButton.setBackgroundResource(R.drawable.rounded_grey_button);
                 testStopButton.setEnabled(false);
@@ -115,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, Foreground.class);
                 intent.putExtra("isReal", true);
                 intent.putExtra("messageInput", Objects.requireNonNull(messageInput.getText()).toString().replaceAll(" ", ""));
-                intent.putExtra("numberInput", Optional.ofNullable(numberInput.getText()).map(Object::toString).orElse(null));
+                intent.putExtra("customStatusInput", Optional.ofNullable(customStatusInput.getText()).map(Object::toString).orElse(null));
                 startService(intent);
             }
         });
@@ -125,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 messageInput.setEnabled(true);
-                numberInput.setEnabled(true);
+                customStatusInput.setEnabled(true);
                 testStartButton.setEnabled(true);
                 testStartButton.setBackgroundResource(R.drawable.rounded_real_green_button);
                 testStopButton.setEnabled(true);

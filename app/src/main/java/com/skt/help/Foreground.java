@@ -22,7 +22,6 @@ import com.google.android.gms.common.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Foreground extends Service {
     private static final int NOTIFICATION_ID = 1;
@@ -35,7 +34,7 @@ public class Foreground extends Service {
 
     // inputText & numberText
     private String inputText;
-    private String numberText;
+    private String customStatusText;
 
     // Speech To Text
     private SpeechRecognizer speechRecognizer;
@@ -54,7 +53,7 @@ public class Foreground extends Service {
         if (intent != null) {
             isReal = intent.getBooleanExtra("isReal", false);
             inputText = intent.getStringExtra("messageInput");
-            numberText = intent.getStringExtra("numberInput");
+            customStatusText = intent.getStringExtra("customStatusInput");
         }
         return START_STICKY;
     }

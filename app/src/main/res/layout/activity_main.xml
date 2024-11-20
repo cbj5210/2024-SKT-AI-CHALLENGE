@@ -51,7 +51,7 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/custom_message_label"
+                android:id="@+id/custom_emergency_message_label"
                 android:layout_width="0px"
                 android:layout_height="wrap_content"
                 android:layout_weight="6"
@@ -65,11 +65,13 @@
 
             </LinearLayout>
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/custom_message_text"
+            <EditText
+                android:id="@+id/custom_emergency_message_text"
                 android:layout_width="0px"
                 android:layout_height="wrap_content"
                 android:layout_weight="10"
+                android:ems="10"
+                android:inputType="text"
                 android:text="시작" />
 
             <LinearLayout
@@ -95,11 +97,11 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/custom_number_label"
+                android:id="@+id/custom_status_label"
                 android:layout_width="0px"
                 android:layout_height="wrap_content"
-                android:layout_weight="8"
-                android:text="메세지를 전송할 번호 :" />
+                android:layout_weight="3"
+                android:text="특이사항 :" />
 
             <LinearLayout
                 android:layout_width="0px"
@@ -109,12 +111,15 @@
 
             </LinearLayout>
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/custom_number_text"
+            <EditText
+                android:id="@+id/custom_status_text"
                 android:layout_width="0px"
                 android:layout_height="wrap_content"
                 android:layout_weight="10"
-                android:text="01011112222" />
+                android:ems="10"
+                android:gravity="start|top"
+                android:inputType="textMultiLine"
+                android:text="나는 고지혈증을 앓고 있어 낮에 연락할 번호는 000-1111-1111이고 밤에 연락할 번호는 010-2222-2222야" />
 
             <LinearLayout
                 android:layout_width="0px"

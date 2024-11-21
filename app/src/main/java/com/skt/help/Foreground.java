@@ -36,6 +36,7 @@ import com.skt.help.model.ChatGptResponse;
 import com.skt.help.repository.NaverRepository;
 import com.skt.help.service.gpt.GptService;
 import com.skt.help.service.location.AddressService;
+import com.skt.help.service.mlmodel.EmbeddedModelService;
 import com.skt.help.service.sns.SmsService;
 
 import java.util.ArrayList;
@@ -251,16 +252,18 @@ public class Foreground extends Service {
                 // 위험 감지 이후 3번 음성을 인식 하였으면
                 if (isEmergency && !CollectionUtils.isEmpty(recordMessageList) && recordMessageList.size() == 3) {
 
+                    String requestMessage = String.join(" ", recordMessageList);
+
                     // 모바일 네트워크가 사용 가능하면
                     if (isMobileDataEnabled(getApplicationContext())) {
 
                         // call GPT
-                        String gptRequestMessage = String.join(" ", recordMessageList);
+
                         GptService gptService = new GptService(getApplicationContext());
 
                         new Thread(() -> {
                             try {
-                                String gptTextResponse = gptService.process(gptRequestMessage, currentLocation, customStatusText);
+                                String gptTextResponse = gptService.process(requestMessage, currentLocation, customStatusText);
 
                                 ChatGptResponse gptResponse;
                                 try {
@@ -303,13 +306,17 @@ public class Foreground extends Service {
                         }).start();
 
                     } else {
-                        // 데이터 사용이 불가하면
+                        // 데이터 사용이 불가하면 소형 모델로 위험 상황 판단
+                        EmbeddedModelService embeddedModelService = new EmbeddedModelService(getApplicationContext());
 
-                        // todo : 소형 모델로 위험 상황 판단
+                        boolean result = embeddedModelService.isEmergency(requestMessage);
+                        if (result) {
+                            // todo : 녹취 텍스트에 위도 경도를 붙여서 119에 문자 발송
 
-                        // todo : 녹취 텍스트에 위도 경도를 붙여서 119에 문자 발송
-
-
+                            SmsService smsService = new SmsService();
+                            // todo : 실제로 관공서에 전송되지 않게 임시로 주석 처리
+                            smsService.sendSmsMessage("010-5353-5210", String.format("위급 상황으로 판단됩니다. 녹취 내용 : %s, 위도 : %s, 경도 : %s", requestMessage, currentLatitude, currentLongitude));
+                        }
                     }
 
                     // 긴급 상황 전파 완료

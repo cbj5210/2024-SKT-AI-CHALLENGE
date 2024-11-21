@@ -22,7 +22,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.common.util.CollectionUtils;
 import com.skt.help.model.ChatGptResponse;
+import com.skt.help.repository.NaverRepository;
 import com.skt.help.service.gpt.GptService;
+import com.skt.help.service.location.AddressService;
+import com.skt.help.service.location.LocationService;
 import com.skt.help.service.sns.SmsService;
 
 import java.util.ArrayList;
@@ -30,7 +33,7 @@ import java.util.List;
 
 public class Foreground extends Service {
     private static final int NOTIFICATION_ID = 1;
-    private static ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     // isTest? or isReal?
     private boolean isReal;
@@ -46,6 +49,11 @@ public class Foreground extends Service {
     private SpeechRecognizer speechRecognizer;
     private Intent intent;
     private List<String> recordMessageList = new ArrayList<>();
+
+    // Location
+    private double currentLatitude; // 위도
+    private double currentLongitude; // 경도
+    private String currentLocation;
 
     public Foreground() {}
 
@@ -195,16 +203,38 @@ public class Foreground extends Service {
                 // 위험 감지 이후 3번 음성을 인식 하였으면
                 if (isEmergency && !CollectionUtils.isEmpty(recordMessageList) && recordMessageList.size() == 3) {
 
-                    String gptRequestMessage = String.join(" ", recordMessageList);
+                    // todo : 현위치 파악 및 주소 변환
+                    AddressService addressService = new AddressService();
+                    LocationService locationService = new LocationService(getApplicationContext());
+                    locationService.getLastKnownLocation(new LocationService.LocationCallbackListener() {
+                        @Override
+                        public void onLocationReceived(double latitude, double longitude) {
+                            currentLatitude = latitude;
+                            currentLongitude = longitude;
+                            String coordinate = longitude + "," + latitude;
+                            addressService.convert(coordinate, new NaverRepository.ReverseGeocodeCallback() {
+                                @Override
+                                public void onSuccess(String address) {
+                                    currentLocation = address;
+                                }
 
-                    // todo : remove for test
-                    Toast.makeText(Foreground.this, gptRequestMessage, Toast.LENGTH_SHORT).show();
+                                @Override
+                                public void onError(String errorMessage) {
 
-                    // todo : 현위치 파악
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onLocationError(String errorMsg) {
+
+                        }
+                    });
 
                     // todo : Call GPT
+                    String gptRequestMessage = String.join(" ", recordMessageList);
                     GptService gptService = new GptService(getApplicationContext());
-                    String gptTextResponse = gptService.process(gptRequestMessage);
+                    String gptTextResponse = gptService.process(gptRequestMessage, currentLocation, customStatusText);
 
                     ChatGptResponse gptResponse;
                     try {

@@ -271,7 +271,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        // 하혁님 버튼
+        /*// 하혁님 버튼
         Button btn_gpt = findViewById(R.id.button6);
         gptService = new GptService(this);
         embeddedModelService = new EmbeddedModelService(this);
@@ -292,16 +292,7 @@ public class MainActivity extends AppCompatActivity {
                     runOnUiThread(() -> Toast.makeText(MainActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show());
                 }
             }).start();
-        });
-
-        // 권한 확인 및 요청 코드 추가 (MainActivity의 onCreate()에서)
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    100);  // REQUEST_CODE는 원하는 값으로 설정 가능
-        }
+        });*/
 
         // sms 버튼
         Button sms_button = findViewById(R.id.button8);
@@ -354,6 +345,15 @@ public class MainActivity extends AppCompatActivity {
                         new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 3
                 );
             }
+        }
+
+        // ACCESS_FINE_LOCATION
+        if (ContextCompat.checkSelfPermission(this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 4
+            );
         }
     }
 

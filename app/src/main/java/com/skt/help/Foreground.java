@@ -241,7 +241,7 @@ public class Foreground extends Service {
             String trimMessage = message.replaceAll(" ", "");
 
             if (isReal) { // 테스트가 아닌 경우
-                if (trimMessage.contains(inputText)) { //  위험 감지 메세지가 포함된 경우 새로운 위험이 발생했다고 판단하고
+                if (!isEmergency && trimMessage.contains(inputText)) { //  위험 감지 메세지가 포함된 경우 새로운 위험이 발생했다고 판단하고
                     recordMessageList = new ArrayList<>(); // list 초기화
                     isEmergency = true;
                 }

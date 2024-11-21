@@ -7,23 +7,33 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Looper;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.widget.Toast;
 
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.common.util.CollectionUtils;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 import com.skt.help.model.ChatGptResponse;
 import com.skt.help.repository.NaverRepository;
 import com.skt.help.service.gpt.GptService;
@@ -54,6 +64,8 @@ public class Foreground extends Service {
     private List<String> recordMessageList = new ArrayList<>();
 
     // Location
+    private FusedLocationProviderClient fusedLocationProviderClient;
+    private LocationCallback locationCallback;
     private double currentLatitude; // 위도
     private double currentLongitude; // 경도
     private String currentLocation;
@@ -82,6 +94,39 @@ public class Foreground extends Service {
 
         // 상태 알림창 추가
         makeNotification();
+
+        // 위치 정보
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+                    // GPS 위치 정보 처리
+                    //Log.d(TAG, "위도: " + location.getLatitude() + ", 경도: " + location.getLongitude());
+                    currentLatitude = location.getLatitude();
+                    currentLongitude = location.getLongitude();
+
+                    String coordinate = currentLongitude + "," + currentLatitude;
+                    AddressService addressService = new AddressService();
+                    addressService.convert(coordinate, new NaverRepository.ReverseGeocodeCallback() {
+                        @Override
+                        public void onSuccess(String address) {
+                            currentLocation = address;
+                        }
+
+                        @Override
+                        public void onError(String errorMessage) {
+                            System.out.println("error");
+                        }
+                    });
+                }
+            }
+        };
+
+        startLocationUpdates();
 
         // speechRecognizer 셋팅
         intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -200,14 +245,10 @@ public class Foreground extends Service {
                     recordMessageList = new ArrayList<>(); // list 초기화
                     isEmergency = true;
                 }
-
                 recordMessageList.add(message); // list에 음성 텍스트 추가
 
                 // 위험 감지 이후 3번 음성을 인식 하였으면
                 if (isEmergency && !CollectionUtils.isEmpty(recordMessageList) && recordMessageList.size() == 3) {
-
-                    // 현위치 파악 및 주소 변환
-                    updateLocation();
 
                     // 모바일 네트워크가 사용 가능하면
                     if (isMobileDataEnabled(getApplicationContext())) {
@@ -215,38 +256,46 @@ public class Foreground extends Service {
                         // call GPT
                         String gptRequestMessage = String.join(" ", recordMessageList);
                         GptService gptService = new GptService(getApplicationContext());
-                        String gptTextResponse = gptService.process(gptRequestMessage, currentLocation, customStatusText);
 
-                        ChatGptResponse gptResponse;
-                        try {
-                            gptResponse = objectMapper.readValue(gptTextResponse, ChatGptResponse.class);
-                        } catch (JsonProcessingException e) {
-                            throw new RuntimeException(e);
-                        }
+                        new Thread(() -> {
+                            try {
+                                String gptTextResponse = gptService.process(gptRequestMessage, currentLocation, customStatusText);
 
-                        // 긴급 상황이면
-                        if (gptResponse.isEmergency()) {
-                            String context = gptResponse.getContext();
-                            SmsService smsService = new SmsService();
+                                ChatGptResponse gptResponse;
+                                try {
+                                    gptResponse = objectMapper.readValue(gptTextResponse, ChatGptResponse.class);
+                                } catch (JsonProcessingException e) {
+                                    throw new RuntimeException(e);
+                                }
 
-                            // 단발성 발송일지, 추적 관찰이 필요할지 서비스 분기
-                            if (gptResponse.isLocationTracking()) {
-                                // todo : 추적 관찰 필요
-                                // 위치 정보  새로 받아야함
+                                // 긴급 상황이면
+                                if (gptResponse.isEmergency()) {
+                                    String context = gptResponse.getContext();
+                                    SmsService smsService = new SmsService();
 
-                            } else {
-                                // 단발성 메세지 전송
-                                String target = gptResponse.getTarget();
-                                // todo : 실제로 관공서에 전송되지 않게 임시로 주석 처리
+                                    // 단발성 발송일지, 추적 관찰이 필요할지 서비스 분기
+                                    if (gptResponse.isLocationTracking()) {
+                                        // todo : 추적 관찰 필요
+                                        // 위치 정보  새로 받아야함
+
+                                    } else {
+                                        // 단발성 메세지 전송
+                                        String target = gptResponse.getTarget();
+                                        // todo : 실제로 관공서에 전송되지 않게 임시로 주석 처리
                                 /*if (target != null) {
                                     smsService.sendSmsMessage(target, context);
                                 }*/
 
-                                for (String number : gptResponse.getContextTo()) {
-                                    smsService.sendSmsMessage(number, context);
+                                        for (String number : gptResponse.getContextTo()) {
+                                            smsService.sendSmsMessage(number, context);
+                                        }
+                                    }
                                 }
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
-                        }
+                        }).start();
+
                     } else {
                         // 데이터 사용이 불가하면
 
@@ -278,33 +327,23 @@ public class Foreground extends Service {
         }
     };
 
-    public void updateLocation () {
-        AddressService addressService = new AddressService();
-        LocationService locationService = new LocationService(getApplicationContext());
-        locationService.getLastKnownLocation(new LocationService.LocationCallbackListener() {
-            @Override
-            public void onLocationReceived(double latitude, double longitude) {
-                currentLatitude = latitude;
-                currentLongitude = longitude;
-                String coordinate = longitude + "," + latitude;
-                addressService.convert(coordinate, new NaverRepository.ReverseGeocodeCallback() {
-                    @Override
-                    public void onSuccess(String address) {
-                        currentLocation = address;
-                    }
+    private void startLocationUpdates() {
+        LocationRequest locationRequest = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            locationRequest = new LocationRequest.Builder(5000) // 5초 간격
+                    .setMinUpdateIntervalMillis(2000) // 최소 업데이트 간격 (2초)
+                    .build();
+        }
 
-                    @Override
-                    public void onError(String errorMessage) {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
 
-                    }
-                });
-            }
-
-            @Override
-            public void onLocationError(String errorMsg) {
-
-            }
-        });
+        fusedLocationProviderClient.requestLocationUpdates(
+                locationRequest,
+                locationCallback,
+                null
+        );
     }
 
     public boolean isMobileDataEnabled(Context context) {

@@ -60,11 +60,11 @@ public class NaverRepository {
                                 .append(res.getRegion().getArea3().getName()).append(" ")
                                 .append(res.getLand().getName()).append(" ")
                                 .append(res.getLand().getNumber1());
-                        if(res.getLand().getNumber2().isEmpty()) {
+                        /*if(res.getLand().getNumber2().isEmpty()) {
                             addressBuilder.append("\n");
                         } else {
                             addressBuilder.append("-").append(res.getLand().getNumber2()).append("\n");
-                        }
+                        }*/
                     }
                     String address = addressBuilder.toString();
                     Log.d(TAG, "주소: " + address);

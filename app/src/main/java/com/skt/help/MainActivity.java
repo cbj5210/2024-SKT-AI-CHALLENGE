@@ -248,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onLocationReceived(double latitude, double longitude) {
                     double myLatitude = 37.339578;
                     double myLongitude = 127.092850;
-                    String coordinate = myLongitude + "," + myLatitude;
+                    String coordinate = longitude + "," + latitude;
                     String coordinateText = "위도: " + latitude + ", 경도: " + longitude;
                     addressService.convert(coordinate, new ReverseGeocodeCallback() {
                         @Override

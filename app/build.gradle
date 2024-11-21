@@ -46,5 +46,5 @@ dependencies {
     implementation libs.okhttp
     implementation libs.logging.interceptor
     implementation libs.litert
-    implementation libs.open.korean.text
+    implementation libs.open.korean.text.v231
 }

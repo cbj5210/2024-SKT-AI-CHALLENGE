@@ -237,9 +237,10 @@ public class Foreground extends Service {
                             } else {
                                 // 단발성 메세지 전송
                                 String target = gptResponse.getTarget();
-                                if (target != null) {
+                                // todo : 실제로 관공서에 전송되지 않게 임시로 주석 처리
+                                /*if (target != null) {
                                     smsService.sendSmsMessage(target, context);
-                                }
+                                }*/
 
                                 for (String number : gptResponse.getContextTo()) {
                                     smsService.sendSmsMessage(number, context);

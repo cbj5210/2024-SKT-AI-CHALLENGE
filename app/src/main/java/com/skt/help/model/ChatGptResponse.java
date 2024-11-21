@@ -7,7 +7,6 @@ public class ChatGptResponse {
     private Boolean isLocationTracking;
     private String emergencyDetail;
     private String target;
-    private String message;
     private List<String> contextTo;
     private String context;
 
@@ -15,12 +14,11 @@ public class ChatGptResponse {
 
     }
 
-    public ChatGptResponse(boolean isEmergency, boolean isLocationTracking, String emergencyDetail, String target, String message, List<String> contextTo, String context) {
+    public ChatGptResponse(boolean isEmergency, boolean isLocationTracking, String emergencyDetail, String target, List<String> contextTo, String context) {
         this.isEmergency = isEmergency;
         this.isLocationTracking = isLocationTracking;
         this.emergencyDetail = emergencyDetail;
         this.target = target;
-        this.message = message;
         this.contextTo = contextTo;
         this.context = context;
     }
@@ -55,14 +53,6 @@ public class ChatGptResponse {
 
     public void setTarget(String target) {
         this.target = target;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
     }
 
     public List<String> getContextTo() {

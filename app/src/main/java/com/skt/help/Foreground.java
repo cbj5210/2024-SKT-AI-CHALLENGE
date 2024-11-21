@@ -16,7 +16,6 @@ import android.net.NetworkCapabilities;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Looper;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -33,19 +32,20 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.Priority;
 import com.skt.help.model.ChatGptResponse;
 import com.skt.help.repository.NaverRepository;
 import com.skt.help.service.gpt.GptService;
 import com.skt.help.service.location.AddressService;
-import com.skt.help.service.location.LocationService;
 import com.skt.help.service.sns.SmsService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Foreground extends Service {
     private static final int NOTIFICATION_ID = 1;
+    private final Pattern pattern = Pattern.compile("```json\\s*([\\s\\S]*?)\\s*```");
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     // isTest? or isReal?
@@ -263,18 +263,22 @@ public class Foreground extends Service {
 
                                 ChatGptResponse gptResponse;
                                 try {
+                                    Matcher matcher = pattern.matcher(gptTextResponse);
+                                    if (matcher.find()) {
+                                        gptTextResponse = matcher.group(1);
+                                    }
                                     gptResponse = objectMapper.readValue(gptTextResponse, ChatGptResponse.class);
                                 } catch (JsonProcessingException e) {
                                     throw new RuntimeException(e);
                                 }
 
                                 // 긴급 상황이면
-                                if (gptResponse.isEmergency()) {
+                                if (gptResponse.getIsEmergency()) {
                                     String context = gptResponse.getContext();
                                     SmsService smsService = new SmsService();
 
                                     // 단발성 발송일지, 추적 관찰이 필요할지 서비스 분기
-                                    if (gptResponse.isLocationTracking()) {
+                                    if (gptResponse.getIsLocationTracking()) {
                                         // todo : 추적 관찰 필요
                                         // 위치 정보  새로 받아야함
 

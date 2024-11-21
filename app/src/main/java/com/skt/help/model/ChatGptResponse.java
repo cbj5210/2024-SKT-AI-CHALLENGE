@@ -3,8 +3,8 @@ package com.skt.help.model;
 import java.util.List;
 
 public class ChatGptResponse {
-    private boolean isEmergency;
-    private boolean isLocationTracking;
+    private Boolean isEmergency;
+    private Boolean isLocationTracking;
     private String emergencyDetail;
     private String target;
     private String message;
@@ -25,19 +25,19 @@ public class ChatGptResponse {
         this.context = context;
     }
 
-    public boolean isEmergency() {
+    public boolean getIsEmergency() {
         return isEmergency;
     }
 
-    public void setEmergency(boolean emergency) {
+    public void setIsEmergency(boolean emergency) {
         isEmergency = emergency;
     }
 
-    public boolean isLocationTracking() {
+    public boolean getIsLocationTracking() {
         return isLocationTracking;
     }
 
-    public void setLocationTracking(boolean locationTracking) {
+    public void setIsLocationTracking(boolean locationTracking) {
         isLocationTracking = locationTracking;
     }
 

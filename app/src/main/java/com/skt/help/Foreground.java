@@ -334,8 +334,8 @@ public class Foreground extends Service {
     private void startLocationUpdates() {
         LocationRequest locationRequest = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-            locationRequest = new LocationRequest.Builder(5000) // 5초 간격
-                    .setMinUpdateIntervalMillis(2000) // 최소 업데이트 간격 (2초)
+            locationRequest = new LocationRequest.Builder(300000) // 5분 간격
+                    .setMinUpdateIntervalMillis(600000) // 최소 업데이트 간격 (10분)
                     .build();
         }
 

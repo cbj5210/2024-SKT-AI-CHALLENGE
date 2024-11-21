@@ -245,6 +245,7 @@ public class Foreground extends Service {
                     recordMessageList = new ArrayList<>(); // list 초기화
                     isEmergency = true;
                 }
+
                 recordMessageList.add(message); // list에 음성 텍스트 추가
 
                 // 위험 감지 이후 3번 음성을 인식 하였으면
@@ -278,7 +279,8 @@ public class Foreground extends Service {
                                     SmsService smsService = new SmsService();
 
                                     // 단발성 발송일지, 추적 관찰이 필요할지 서비스 분기
-                                    if (gptResponse.getIsLocationTracking()) {
+                                    if (false) {//if (gptResponse.getIsLocationTracking()) {
+                                        // todo : 테스트를 위한 임시 주석
                                         // todo : 추적 관찰 필요
                                         // 위치 정보  새로 받아야함
 

@@ -206,35 +206,11 @@ public class Foreground extends Service {
                 // 위험 감지 이후 3번 음성을 인식 하였으면
                 if (isEmergency && !CollectionUtils.isEmpty(recordMessageList) && recordMessageList.size() == 3) {
 
+                    // 현위치 파악 및 주소 변환
+                    updateLocation();
+
                     // 모바일 네트워크가 사용 가능하면
                     if (isMobileDataEnabled(getApplicationContext())) {
-                        // 현위치 파악 및 주소 변환
-                        AddressService addressService = new AddressService();
-                        LocationService locationService = new LocationService(getApplicationContext());
-                        locationService.getLastKnownLocation(new LocationService.LocationCallbackListener() {
-                            @Override
-                            public void onLocationReceived(double latitude, double longitude) {
-                                currentLatitude = latitude;
-                                currentLongitude = longitude;
-                                String coordinate = longitude + "," + latitude;
-                                addressService.convert(coordinate, new NaverRepository.ReverseGeocodeCallback() {
-                                    @Override
-                                    public void onSuccess(String address) {
-                                        currentLocation = address;
-                                    }
-
-                                    @Override
-                                    public void onError(String errorMessage) {
-
-                                    }
-                                });
-                            }
-
-                            @Override
-                            public void onLocationError(String errorMsg) {
-
-                            }
-                        });
 
                         // call GPT
                         String gptRequestMessage = String.join(" ", recordMessageList);
@@ -300,6 +276,35 @@ public class Foreground extends Service {
 
         }
     };
+
+    public void updateLocation () {
+        AddressService addressService = new AddressService();
+        LocationService locationService = new LocationService(getApplicationContext());
+        locationService.getLastKnownLocation(new LocationService.LocationCallbackListener() {
+            @Override
+            public void onLocationReceived(double latitude, double longitude) {
+                currentLatitude = latitude;
+                currentLongitude = longitude;
+                String coordinate = longitude + "," + latitude;
+                addressService.convert(coordinate, new NaverRepository.ReverseGeocodeCallback() {
+                    @Override
+                    public void onSuccess(String address) {
+                        currentLocation = address;
+                    }
+
+                    @Override
+                    public void onError(String errorMessage) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onLocationError(String errorMsg) {
+
+            }
+        });
+    }
 
     public boolean isMobileDataEnabled(Context context) {
         ConnectivityManager connectivityManager =

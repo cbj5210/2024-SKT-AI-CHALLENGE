@@ -9,7 +9,6 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -17,7 +16,6 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
 
 import com.google.android.material.button.MaterialButton;
 import com.skt.help.data.database.DatabaseHelper;
@@ -60,6 +58,11 @@ public class MainActivity extends AppCompatActivity {
         // 필요한 권한 요청
         requestPermission();
 
+        // 텍스트 입력창 정의
+        EditText messageInput = findViewById(R.id.custom_emergency_message_text);
+        EditText customStatusInput = findViewById(R.id.custom_status_text);
+
+        // 설정 저장
         databaseRepository = new DatabaseRepository(this);
         databaseRepository.open();
 
@@ -71,10 +74,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             userCondition = databaseRepository.fetchUserCondition(id);
         }
-
-        // 텍스트 입력창 정의
-        EditText messageInput = findViewById(R.id.custom_emergency_message_text);
-        EditText customStatusInput = findViewById(R.id.custom_status_text);
 
         if(!Objects.isNull(userCondition)) {
             messageInput.setText(userCondition.keyword());

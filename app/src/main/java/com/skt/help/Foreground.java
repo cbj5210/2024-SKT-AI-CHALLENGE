@@ -15,10 +15,12 @@ import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
@@ -71,6 +73,9 @@ public class Foreground extends Service {
     private double currentLongitude; // 경도
     private String currentLocation;
 
+    // sms send
+    int currentCount;
+
     public Foreground() {}
 
     @Override
@@ -78,6 +83,7 @@ public class Foreground extends Service {
         throw new UnsupportedOperationException("Foreground onBind() exception");
     }
 
+    // Intent 처리
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
@@ -230,7 +236,7 @@ public class Foreground extends Service {
 
         @Override
         public void onError(int i) {
-            // todo error message
+            Log.d("음성 인식 에러 발생, 에러 코드 :  ", Integer.toString(i));
             startSpeechRecognizer();
         }
 
@@ -258,7 +264,6 @@ public class Foreground extends Service {
                     if (isMobileDataEnabled(getApplicationContext())) {
 
                         // call GPT
-
                         GptService gptService = new GptService(getApplicationContext());
 
                         new Thread(() -> {
@@ -282,23 +287,34 @@ public class Foreground extends Service {
                                     SmsService smsService = new SmsService();
 
                                     // 단발성 발송일지, 추적 관찰이 필요할지 서비스 분기
-                                    if (false) {//if (gptResponse.getIsLocationTracking()) {
-                                        // todo : 테스트를 위한 임시 주석
-                                        // todo : 추적 관찰 필요
-                                        // 위치 정보  새로 받아야함
+                                    int repeatCount = gptResponse.getIsLocationTracking() ? 5 : 1;
+                                    currentCount = 0;
 
-                                    } else {
-                                        // 단발성 메세지 전송
-                                        String target = gptResponse.getTarget();
-                                        // todo : 실제로 관공서에 전송되지 않게 임시로 주석 처리
-                                /*if (target != null) {
-                                    smsService.sendSmsMessage(target, context);
-                                }*/
+                                    Handler handler = new Handler(getMainLooper());
+                                    Runnable runnable = new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (currentCount < repeatCount) {
+                                                currentCount++;
 
-                                        for (String number : gptResponse.getContextTo()) {
-                                            smsService.sendSmsMessage(number, context);
+                                                // 메세지 전송
+                                                String target = gptResponse.getTarget();
+
+                                                // todo : 실제로 관공서에 전송되지 않게 임시로 주석 처리
+                                                /*if (target != null) {
+                                                    smsService.sendSmsMessage(target, context);
+                                                }*/
+
+                                                for (String number : gptResponse.getContextTo()) {
+                                                    smsService.sendSmsMessage(number, context);
+                                                }
+
+                                                handler.postDelayed(this, 60000);
+                                            }
                                         }
-                                    }
+                                    };
+
+                                    handler.postDelayed(runnable, 0);
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -312,10 +328,10 @@ public class Foreground extends Service {
                         boolean result = embeddedModelService.isEmergency(requestMessage);
                         if (result) {
                             // todo : 녹취 텍스트에 위도 경도를 붙여서 119에 문자 발송
-
+                            // todo : 실제로 관공서에 전송되지 않게 임시로 번호 설정
+                            String targetNumber = "010-5353-5210";
                             SmsService smsService = new SmsService();
-                            // todo : 실제로 관공서에 전송되지 않게 임시로 주석 처리
-                            smsService.sendSmsMessage("010-5353-5210", String.format("위급 상황으로 판단됩니다. 녹취 내용 : %s, 위도 : %s, 경도 : %s", requestMessage, currentLatitude, currentLongitude));
+                            smsService.sendSmsMessage(targetNumber, String.format("위급 상황으로 판단됩니다. 녹취 내용 : %s, 위도 : %s, 경도 : %s", requestMessage, currentLatitude, currentLongitude));
                         }
                     }
 

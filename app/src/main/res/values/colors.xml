@@ -2,4 +2,12 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="appBackground">#FFD9E5F5</color>
+
+    <color name="testButtonColor">#FF5185FF</color>
+    <color name="serviceButtonColor">#FFEF4123</color>
+
+    <color name="disabledButtonBackground">#FFECEEED</color>
+    <color name="disabledButtonText">#FFB4B7B8</color>
+
 </resources>

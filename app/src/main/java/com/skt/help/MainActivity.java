@@ -2,12 +2,12 @@ package com.skt.help;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,18 +17,16 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 
-import android.Manifest;
-
+import com.google.android.material.button.MaterialButton;
 import com.skt.help.data.database.DatabaseHelper;
 import com.skt.help.repository.DatabaseRepository;
 import com.skt.help.model.UserCondition;
-import com.skt.help.repository.NaverRepository.ReverseGeocodeCallback;
 import com.skt.help.service.gpt.GptService;
 import com.skt.help.service.location.AddressService;
 import com.skt.help.service.location.LocationService;
 import com.skt.help.service.mlmodel.EmbeddedModelService;
-import com.skt.help.service.sns.SmsService;
 import com.skt.help.service.sns.SnsService;
 
 import java.util.Objects;
@@ -46,6 +44,12 @@ public class MainActivity extends AppCompatActivity {
     private final long id = 1;
     private final Handler handler = new Handler();
     private Runnable saveRunnable;
+
+    // 버튼 정의
+    MaterialButton testStartButton;
+    MaterialButton testStopButton;
+    MaterialButton serviceStartButton;
+    MaterialButton serviceStopButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,10 +125,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // 버튼 정의
-        Button testStartButton = findViewById(R.id.testStartButton);
-        Button testStopButton = findViewById(R.id.testStopButton);
-        Button serviceStartButton = findViewById(R.id.serviceStartButton);
-        Button serviceStopButton = findViewById(R.id.serviceStopButton);
+        testStartButton = findViewById(R.id.testStartButton);
+        testStopButton = findViewById(R.id.testStopButton);
+        serviceStartButton = findViewById(R.id.serviceStartButton);
+        serviceStopButton = findViewById(R.id.serviceStopButton);
 
         // 테스트 시작 버튼 클릭
         testStartButton.setOnClickListener(new View.OnClickListener() {
@@ -133,12 +137,10 @@ public class MainActivity extends AppCompatActivity {
                 //버튼 비활성화 및 색상 변경
                 messageInput.setEnabled(false);
                 customStatusInput.setEnabled(false);
-                testStartButton.setEnabled(false);
-                testStartButton.setBackgroundResource(R.drawable.rounded_grey_button);
-                serviceStartButton.setEnabled(false);
-                serviceStartButton.setBackgroundResource(R.drawable.rounded_grey_button);
-                serviceStopButton.setEnabled(false);
-                serviceStopButton.setBackgroundResource(R.drawable.rounded_grey_button);
+                buttonDisable(testStartButton);
+                testStopButtonEnable();
+                buttonDisable(serviceStartButton);
+                buttonDisable(serviceStopButton);
 
                 // Foreground Service 실행
                 Toast.makeText(MainActivity.this, "테스트 시작", Toast.LENGTH_SHORT).show();
@@ -154,12 +156,10 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 messageInput.setEnabled(true);
                 customStatusInput.setEnabled(true);
-                testStartButton.setEnabled(true);
-                testStartButton.setBackgroundResource(R.drawable.rounded_real_green_button);
-                serviceStartButton.setEnabled(true);
-                serviceStartButton.setBackgroundResource(R.drawable.rounded_real_red_button);
-                serviceStopButton.setEnabled(true);
-                serviceStopButton.setBackgroundResource(R.drawable.rounded_red_button);
+                testStartButtonEnable();
+                buttonDisable(testStopButton);
+                serviceStartButtonEnable();
+                buttonDisable(serviceStopButton);
 
                 Toast.makeText(MainActivity.this, "테스트 종료", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(MainActivity.this, Foreground.class);
@@ -173,12 +173,11 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 messageInput.setEnabled(false);
                 customStatusInput.setEnabled(false);
-                testStartButton.setEnabled(false);
-                testStartButton.setBackgroundResource(R.drawable.rounded_grey_button);
-                testStopButton.setEnabled(false);
-                testStopButton.setBackgroundResource(R.drawable.rounded_grey_button);
-                serviceStartButton.setEnabled(false);
-                serviceStartButton.setBackgroundResource(R.drawable.rounded_grey_button);
+                buttonDisable(testStartButton);
+                buttonDisable(testStopButton);
+                buttonDisable(serviceStartButton);
+                serviceStopButtonEnable();
+
 
                 Toast.makeText(MainActivity.this, "위험 감지 시작", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(MainActivity.this, Foreground.class);
@@ -195,12 +194,10 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 messageInput.setEnabled(true);
                 customStatusInput.setEnabled(true);
-                testStartButton.setEnabled(true);
-                testStartButton.setBackgroundResource(R.drawable.rounded_real_green_button);
-                testStopButton.setEnabled(true);
-                testStopButton.setBackgroundResource(R.drawable.rounded_green_button);
-                serviceStartButton.setEnabled(true);
-                serviceStartButton.setBackgroundResource(R.drawable.rounded_real_red_button);
+                testStartButtonEnable();
+                buttonDisable(testStopButton);
+                serviceStartButtonEnable();
+                buttonDisable(serviceStopButton);
 
                 Toast.makeText(MainActivity.this, "위험 감지 종료", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(MainActivity.this, Foreground.class);
@@ -262,6 +259,46 @@ public class MainActivity extends AppCompatActivity {
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 4
             );
         }
+    }
+
+    private void testStartButtonEnable() {
+        testStartButton.setEnabled(true);
+        testStartButton.setTextColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white)));
+        testStartButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.testButtonColor)));
+        testStartButton.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white)));
+        testStartButton.setStrokeWidth(2);
+    }
+
+    private void testStopButtonEnable() {
+        testStopButton.setEnabled(true);
+        testStopButton.setTextColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.testButtonColor)));
+        testStopButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white)));
+        testStopButton.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.testButtonColor)));
+        testStopButton.setStrokeWidth(2);
+    }
+
+    private void serviceStartButtonEnable() {
+        serviceStartButton.setEnabled(true);
+        serviceStartButton.setTextColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white)));
+        serviceStartButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.serviceButtonColor)));
+        serviceStartButton.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white)));
+        serviceStartButton.setStrokeWidth(2);
+    }
+
+    private void serviceStopButtonEnable() {
+        serviceStopButton.setEnabled(true);
+        serviceStopButton.setTextColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.serviceButtonColor)));
+        serviceStopButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white)));
+        serviceStopButton.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.serviceButtonColor)));
+        serviceStopButton.setStrokeWidth(2);
+    }
+
+    private void buttonDisable(MaterialButton button) {
+        button.setEnabled(false);
+        button.setTextColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disabledButtonText)));
+        button.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disabledButtonBackground)));
+        button.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white)));
+        button.setStrokeWidth(2);
     }
 
     @Override

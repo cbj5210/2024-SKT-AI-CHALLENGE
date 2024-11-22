@@ -5,28 +5,38 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/design_default_color_background"
+    android:background="@color/appBackground"
     tools:context=".MainActivity">
 
     <!-- Header Section -->
     <LinearLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="230dp"
         android:orientation="vertical"
         android:gravity="center"
+        android:paddingTop="60dp"
         app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:paddingTop="8dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            app:srcCompat="@drawable/alarm" />
 
         <TextView
             android:id="@+id/header_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="긴급상황 도와줘!"
-            android:textSize="28sp"
+            android:textSize="30sp"
             android:textColor="@color/black"
-            android:fontFamily="sans-serif-medium"
-            android:textStyle="bold"
-            android:padding="16dp" />
+            android:fontFamily="@font/rixyeol"
+            android:paddingTop="16dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            />
 
         <TextView
             android:id="@+id/header_subtitle"
@@ -36,7 +46,9 @@
             android:textSize="16sp"
             android:textColor="@color/black"
             android:fontFamily="sans-serif-light"
-            android:padding="8dp" />
+            android:paddingBottom="8dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp" />
     </LinearLayout>
 
     <!-- Card: Custom Emergency Message -->
@@ -62,7 +74,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="위험 감지 메세지"
-                android:textSize="18sp"
+                android:textSize="20sp"
                 android:textColor="@color/black"
                 android:layout_marginBottom="8dp" />
 
@@ -101,7 +113,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="특이사항"
-                android:textSize="18sp"
+                android:textSize="20sp"
                 android:textColor="@color/black"
                 android:layout_marginBottom="8dp" />
 
@@ -128,26 +140,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"
-        android:padding="16dp">
+        android:paddingTop="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="10dp">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/testStartButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="80dp"
             android:layout_weight="1"
             android:text="테스트 시작"
             android:textColor="@color/white"
-            android:backgroundTint="@color/black"
+            android:backgroundTint="@color/testButtonColor"
+            app:strokeColor="@color/white"
+            app:strokeWidth="2dp"
             android:layout_marginEnd="8dp"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/testStopButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="80dp"
             android:layout_weight="1"
             android:text="테스트 종료"
-            android:textColor="@color/white"
-            android:backgroundTint="@color/black"
+            app:strokeColor="@color/white"
+            app:strokeWidth="2dp"
+            android:textColor="@color/disabledButtonText"
+            android:backgroundTint="@color/disabledButtonBackground"
             android:layout_marginStart="8dp"/>
     </LinearLayout>
 
@@ -161,27 +180,32 @@
         app:layout_constraintTop_toBottomOf="@id/test_button_section"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"
-        android:padding="16dp">
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="16dp">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/serviceStartButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="80dp"
             android:layout_weight="1"
             android:text="위험 감지 시작"
             android:textColor="@color/white"
-            android:backgroundTint="@color/black"
+            android:backgroundTint="@color/serviceButtonColor"
+            app:strokeColor="@color/white"
+            app:strokeWidth="2dp"
             android:layout_marginEnd="8dp"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/serviceStopButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="80dp"
             android:layout_weight="1"
             android:text="위험 감지 종료"
-            android:textColor="@color/white"
-            android:backgroundTint="@color/black"
+            android:textColor="@color/disabledButtonText"
+            android:backgroundTint="@color/disabledButtonBackground"
+            app:strokeColor="@color/white"
+            app:strokeWidth="2dp"
             android:layout_marginStart="8dp"/>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

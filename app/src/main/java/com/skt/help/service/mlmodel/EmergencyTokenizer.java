@@ -32,7 +32,6 @@ public class EmergencyTokenizer {
         vocab.put("출혈", 16368);
         vocab.put("피", 3747);
         vocab.put("긴급", 8725);
-        vocab.put("도움", 6750);
         vocab.put("위협", 7625);
         vocab.put("강도", 9226);
         vocab.put("침입", 11990);

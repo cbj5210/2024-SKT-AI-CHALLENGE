@@ -258,6 +258,12 @@ public class Foreground extends Service {
                 // 위험 감지 이후 3번 음성을 인식 하였으면
                 if (isEmergency && !CollectionUtils.isEmpty(recordMessageList) && recordMessageList.size() == 3) {
 
+                    // trigger 메세지 제외
+                    recordMessageList.remove(0);
+
+                    // 응급 상황을 판별합니다.
+                    Toast.makeText(Foreground.this, "긴급 상황을 전파합니다.", Toast.LENGTH_SHORT).show();
+
                     String requestMessage = String.join(" ", recordMessageList);
 
                     // 모바일 네트워크가 사용 가능하면
@@ -328,8 +334,9 @@ public class Foreground extends Service {
                         boolean result = embeddedModelService.isEmergency(requestMessage);
                         if (result) {
                             // todo : 녹취 텍스트에 위도 경도를 붙여서 119에 문자 발송
+                            // String targetNumber = "119";
                             // todo : 실제로 관공서에 전송되지 않게 임시로 번호 설정
-                            String targetNumber = "010-5353-5210";
+                            String targetNumber = "010-8377-0944";
                             SmsService smsService = new SmsService();
                             smsService.sendSmsMessage(targetNumber, String.format("위급 상황으로 판단됩니다. 녹취 내용 : %s, 위도 : %s, 경도 : %s", requestMessage, currentLatitude, currentLongitude));
                         }

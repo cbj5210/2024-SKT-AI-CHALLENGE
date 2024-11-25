@@ -27,6 +27,8 @@ import com.skt.help.service.location.LocationService;
 import com.skt.help.service.mlmodel.EmbeddedModelService;
 import com.skt.help.service.sns.SnsService;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -205,57 +207,44 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void requestPermission(){
-        // RECORD_AUDIO 권한 요청
-        if (ContextCompat.checkSelfPermission(this,
-                android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED){
+    private void requestPermission() {
+        List<String> permissions = new ArrayList<>();
 
-            ActivityCompat.requestPermissions(
-                    this,
-                    new String[] {android.Manifest.permission.RECORD_AUDIO}, 0
-            );
+        // RECORD_AUDIO 권한 확인
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(android.Manifest.permission.RECORD_AUDIO);
         }
 
-        // GPS 권한 요청
-        if (ContextCompat.checkSelfPermission(this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this,
-                        android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                    this,
-                    new String[]{
-                            android.Manifest.permission.ACCESS_FINE_LOCATION,
-                            android.Manifest.permission.ACCESS_COARSE_LOCATION
-                    }, 1
-            );
+        // GPS 권한 확인
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(android.Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(android.Manifest.permission.ACCESS_COARSE_LOCATION);
         }
 
-        // SMS 권한 요청
-        if (ContextCompat.checkSelfPermission(this,
-                android.Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                    this,
-                    new String[]{android.Manifest.permission.SEND_SMS}, 2
-            );
+        // SMS 권한 확인
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.SEND_SMS)
+                != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(android.Manifest.permission.SEND_SMS);
         }
 
-        // Notification 권한 요청 (안드로이드 13 이상)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this,
-                    android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(
-                        this,
-                        new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 3
-                );
-            }
+        // Notification 권한 확인 (안드로이드 13 이상)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
+                        != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(android.Manifest.permission.POST_NOTIFICATIONS);
         }
 
-        // ACCESS_FINE_LOCATION
-        if (ContextCompat.checkSelfPermission(this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        // 요청할 권한이 있다면 한 번에 요청
+        if (!permissions.isEmpty()) {
             ActivityCompat.requestPermissions(
                     this,
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 4
+                    permissions.toArray(new String[0]),
+                    0 // requestCode는 하나로 통합
             );
         }
     }

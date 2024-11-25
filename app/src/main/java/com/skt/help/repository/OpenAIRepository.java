@@ -15,8 +15,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class OpenAIRepository {
-    private String API_KEY = "Bearer ";
-    private String key;
+    private String API_KEY = "Bearer";
     private final OpenAIApi openAIApi;
     private final ObjectMapper objectMapper;
 
@@ -68,7 +67,7 @@ public class OpenAIRepository {
                           "content": [
                             {
                               "type": "text",
-                              "text": "You are an employee working in the emergency operations center."
+                              "text": ""
                             }
                           ]
                         },

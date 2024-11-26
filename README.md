@@ -4,8 +4,14 @@
 
 <br /><br />
 
-# 🖥️ Demo 시연 및 테스트
-  * YOUTUBE URL : https://y
+# 🖥️ Demo 시연 및 소개 자료
+  * 시연
+    * [위급 상황이 아닌 경우](https://drive.google.com/file/d/1JWIQb86BzcF6kZUhVT8VVoBKNMfjX_it/view?usp=sharing)
+    * [위급 상황인 경우](https://drive.google.com/file/d/1hH5E4p4pYmPaKZm_BObcrA2Rbgzfsoyg/view?usp=sharing)
+    * [백그라운드에서 동작하는 경우](https://drive.google.com/file/d/1RmF_PRyiKNCCDMF5Gad266Ors3Y9RzmU/view?usp=sharing)
+    * [인터넷 연결 안되는 경우](https://drive.google.com/file/d/15R9qhYXWYA8sGYCZVTKRxdfgftIi-yVm/view?usp=sharing)
+  * 소개 자료
+    * [링크](https://docs.google.com/presentation/d/1gS9bmYXNGlp5W4XJQWgg5G4mfJQigB28/edit?usp=sharing&ouid=105829050231473623633&rtpof=true&sd=true)
 
 <br /><br />
 
